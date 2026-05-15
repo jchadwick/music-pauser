@@ -2,6 +2,16 @@
 
 A minimal macOS menu bar app that automatically pauses Apple Music when your microphone is in use — and resumes it when you're done.
 
+## Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jchadwick/music-pauser/main/install.sh | bash
+```
+
+This downloads the latest release, replaces any existing installation, clears the Gatekeeper quarantine flag, and launches the app.
+
+On first launch, macOS will ask if MusicPauser can control Apple Music via AppleScript. Click **OK**. If you miss it, go to **System Settings → Privacy & Security → Automation** and enable it there.
+
 ## How it works
 
 MusicPauser listens to all audio input devices via CoreAudio. When any device starts recording (Zoom, Teams, QuickTime, Voice Memos, etc.), it pauses Apple Music. When recording stops, it resumes playback — but only if it was the one that paused it (so manual pauses are respected).
@@ -20,26 +30,6 @@ MusicPauser listens to all audio input devices via CoreAudio. When any device st
 
 - macOS 13 Ventura or later
 - Apple Music
-
-## Installation
-
-### Download
-
-Download `MusicPauser.zip` from the [latest GitHub Actions build](https://github.com/jchadwick/music-pauser/actions), unzip, and move `MusicPauser.app` to `/Applications`.
-
-### First launch (Gatekeeper)
-
-Because the app is ad-hoc signed (no Apple Developer account), macOS will block it on first run. To bypass:
-
-```bash
-xattr -dr com.apple.quarantine /Applications/MusicPauser.app
-```
-
-Then open it normally.
-
-### Grant Automation permission
-
-On first launch, macOS will ask if MusicPauser can control Apple Music via AppleScript. Click **OK**. If you miss it, go to **System Settings → Privacy & Security → Automation** and enable it there.
 
 ## Build from source
 
