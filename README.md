@@ -1,6 +1,6 @@
 # MusicPauser
 
-A minimal macOS menu bar app that automatically pauses Apple Music when your microphone is in use — and resumes it when you're done.
+A minimal macOS menu bar app that automatically pauses Apple Music and Spotify when your microphone is in use — and resumes them when you're done.
 
 ## Install
 
@@ -10,14 +10,17 @@ curl -fsSL https://raw.githubusercontent.com/jchadwick/music-pauser/main/install
 
 This downloads the latest release, replaces any existing installation, clears the Gatekeeper quarantine flag, and launches the app.
 
-On first launch, macOS will ask if MusicPauser can control Apple Music via AppleScript. Click **OK**. If you miss it, go to **System Settings → Privacy & Security → Automation** and enable it there.
+On first launch, macOS will ask if MusicPauser can control Apple Music and Spotify via AppleScript. Click **OK** for each. If you miss a prompt, go to **System Settings → Privacy & Security → Automation** and enable the permissions there.
 
 ## How it works
 
-MusicPauser listens to all audio input devices via CoreAudio. When any device starts recording (Zoom, Teams, QuickTime, Voice Memos, etc.), it pauses Apple Music. When recording stops, it resumes playback — but only if it was the one that paused it (so manual pauses are respected).
+MusicPauser listens to all audio input devices via CoreAudio. When any device starts recording (Zoom, Teams, QuickTime, Voice Memos, etc.), it pauses whichever player(s) are currently playing. When recording stops, it resumes them — but only if it was the one that paused them (so manual pauses are respected).
+
+If both Apple Music and Spotify are playing at the same time, both are paused and both are resumed.
 
 ## Features
 
+- Supports **Apple Music** and **Spotify**
 - Monitors **all** input devices, not just the system default — catches virtual devices like `ZoomAudioDevice`
 - Auto-resume is on by default but can be toggled
 - Launch at login support
@@ -29,7 +32,7 @@ MusicPauser listens to all audio input devices via CoreAudio. When any device st
 ## Requirements
 
 - macOS 13 Ventura or later
-- Apple Music
+- Apple Music and/or Spotify
 
 ## Build from source
 
