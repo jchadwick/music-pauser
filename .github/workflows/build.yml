@@ -6,12 +6,17 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: macos-15
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
 
       - name: Build
         run: |
@@ -36,3 +41,19 @@ jobs:
           name: MusicPauser
           path: build/Build/Products/Release/MusicPauser.zip
           retention-days: 30
+
+      - name: Tag release (main only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          BASE="v$(date -u +'%Y.%m.%d')"
+          TAG="$BASE"
+          COUNTER=2
+          while git rev-parse "$TAG" >/dev/null 2>&1; do
+            TAG="${BASE}-${COUNTER}"
+            COUNTER=$((COUNTER + 1))
+          done
+          echo "Creating tag $TAG"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG"
+          git push origin "$TAG"
