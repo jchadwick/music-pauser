@@ -1,0 +1,12 @@
+# Xcode build output
+build/
+DerivedData/
+*.xcuserdata/
+*.xcworkspace/xcuserdata/
+MusicPauser.xcodeproj/xcuserdata/
+
+# macOS
+.DS_Store
+
+# Swift Package Manager
+.build/
