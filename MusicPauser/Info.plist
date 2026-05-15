@@ -23,9 +23,9 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSAppleEventsUsageDescription</key>
-	<string>MusicPauser uses Apple Events to pause and resume Apple Music when your microphone is in use.</string>
+	<string>MusicPauser uses Apple Events to pause and resume Apple Music and Spotify when your microphone is in use.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>MusicPauser monitors microphone activity to automatically pause and resume Apple Music.</string>
+	<string>MusicPauser monitors microphone activity to automatically pause and resume Apple Music and Spotify.</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>
