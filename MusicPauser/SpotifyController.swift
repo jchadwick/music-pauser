@@ -1,10 +1,10 @@
 import AppKit
 import os
 
-final class MusicController: PlayerController {
-    private let logger = Logger(subsystem: "com.jchadwick.musicpauser", category: "MusicController")
-    let kind: PlayerKind = .appleMusic
-    let bundleIdentifier: String = "com.apple.Music"
+final class SpotifyController: PlayerController {
+    private let logger = Logger(subsystem: "com.jchadwick.musicpauser", category: "SpotifyController")
+    let kind: PlayerKind = .spotify
+    let bundleIdentifier: String = "com.spotify.client"
 
     func isRunning() -> Bool {
         NSWorkspace.shared.runningApplications.contains { $0.bundleIdentifier == bundleIdentifier }
@@ -13,7 +13,7 @@ final class MusicController: PlayerController {
         dispatchPrecondition(condition: .onQueue(.main))
         guard isRunning() else { return false }
         let source = """
-        tell application "Music"
+        tell application "Spotify"
             if it is running then
                 return (player state as string)
             end if
@@ -31,12 +31,12 @@ final class MusicController: PlayerController {
     func pause() {
         dispatchPrecondition(condition: .onQueue(.main))
         guard isRunning() else { return }
-        run(#"tell application "Music" to pause"#)
+        run(#"tell application "Spotify" to pause"#)
     }
     func play() {
         dispatchPrecondition(condition: .onQueue(.main))
         guard isRunning() else { return }
-        run(#"tell application "Music" to play"#)
+        run(#"tell application "Spotify" to play"#)
     }
     private func run(_ source: String) {
         guard let script = NSAppleScript(source: source) else { return }

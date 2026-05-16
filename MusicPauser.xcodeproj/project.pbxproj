@@ -13,6 +13,9 @@
 		C1D2E3F4A5B60718293A4B17 /* MicMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D2E3F4A5B60718293A4B16 /* MicMonitor.swift */; };
 		C1D2E3F4A5B60718293A4B19 /* MusicController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D2E3F4A5B60718293A4B18 /* MusicController.swift */; };
 		C1D2E3F4A5B60718293A4B1B /* LoginItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D2E3F4A5B60718293A4B1A /* LoginItem.swift */; };
+		D2E3F4A5B6C70718293A4B21 /* PlayerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E3F4A5B6C70718293A4B20 /* PlayerController.swift */; };
+		D2E3F4A5B6C70718293A4B23 /* SpotifyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E3F4A5B6C70718293A4B22 /* SpotifyController.swift */; };
+		D2E3F4A5B6C70718293A4B25 /* PlayerCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E3F4A5B6C70718293A4B24 /* PlayerCoordinator.swift */; };
 		C1D2E3F4A5B60718293A4B1E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C1D2E3F4A5B60718293A4B1D /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -24,6 +27,9 @@
 		C1D2E3F4A5B60718293A4B16 /* MicMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicMonitor.swift; sourceTree = "<group>"; };
 		C1D2E3F4A5B60718293A4B18 /* MusicController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicController.swift; sourceTree = "<group>"; };
 		C1D2E3F4A5B60718293A4B1A /* LoginItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItem.swift; sourceTree = "<group>"; };
+		D2E3F4A5B6C70718293A4B20 /* PlayerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerController.swift; sourceTree = "<group>"; };
+		D2E3F4A5B6C70718293A4B22 /* SpotifyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyController.swift; sourceTree = "<group>"; };
+		D2E3F4A5B6C70718293A4B24 /* PlayerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerCoordinator.swift; sourceTree = "<group>"; };
 		C1D2E3F4A5B60718293A4B1C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C1D2E3F4A5B60718293A4B1D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -64,6 +70,9 @@
 				C1D2E3F4A5B60718293A4B16 /* MicMonitor.swift */,
 				C1D2E3F4A5B60718293A4B18 /* MusicController.swift */,
 				C1D2E3F4A5B60718293A4B1A /* LoginItem.swift */,
+				D2E3F4A5B6C70718293A4B20 /* PlayerController.swift */,
+				D2E3F4A5B6C70718293A4B22 /* SpotifyController.swift */,
+				D2E3F4A5B6C70718293A4B24 /* PlayerCoordinator.swift */,
 				C1D2E3F4A5B60718293A4B1C /* Info.plist */,
 				C1D2E3F4A5B60718293A4B1D /* Assets.xcassets */,
 			);
@@ -145,6 +154,9 @@
 				C1D2E3F4A5B60718293A4B17 /* MicMonitor.swift in Sources */,
 				C1D2E3F4A5B60718293A4B19 /* MusicController.swift in Sources */,
 				C1D2E3F4A5B60718293A4B1B /* LoginItem.swift in Sources */,
+				D2E3F4A5B6C70718293A4B21 /* PlayerController.swift in Sources */,
+				D2E3F4A5B6C70718293A4B23 /* SpotifyController.swift in Sources */,
+				D2E3F4A5B6C70718293A4B25 /* PlayerCoordinator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
