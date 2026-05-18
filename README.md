@@ -28,6 +28,72 @@ If both Apple Music and Spotify are playing at the same time, both are paused an
 - Menu bar icon reflects current state:
   - `mic.slash + ▶` — mic idle, music playing
   - `mic + ⏸` — mic active, music paused
+- Optional **MQTT integration** with Home Assistant auto-discovery
+
+## MQTT Integration
+
+MusicPauser can publish its state to an MQTT broker and receive playback commands. Open the menu bar icon and choose **MQTT Settings** to configure.
+
+### Settings
+
+| Setting | Default | Description |
+|---|---|---|
+| Host | — | MQTT broker hostname or IP |
+| Port | `1883` | Broker port (`8883` for TLS) |
+| TLS | off | Enable TLS/SSL |
+| Username / Password | — | Broker credentials (password stored in Keychain) |
+| Topic prefix | `musicpauser` | Root of all topics |
+| Device name | machine hostname | Appended to the prefix: `<prefix>/<device>` |
+| Client ID | auto-generated | Unique MQTT client identifier |
+| Publish HA discovery | on | Emit Home Assistant auto-discovery configs on connect |
+
+### Topics
+
+All topics share the base `<prefix>/<device>` (e.g. `musicpauser/my-mac`).
+
+| Topic | Direction | Payload | Notes |
+|---|---|---|---|
+| `…/availability` | published | `online` / `offline` | Retained; LWT sends `offline` |
+| `…/mic/state` | published | `ON` / `OFF` | Retained |
+| `…/player/state` | published | `playing` / `stopped` | Retained |
+| `…/player/attributes` | published | `{"player":"spotify"}` | Retained; `null` when nothing is playing |
+| `…/command` | subscribed | see below | QoS 1 |
+
+### Sending commands
+
+Publish to `…/command` in either format:
+
+**Plain text**
+```
+play
+pause
+stop
+toggle
+pause/spotify
+play/applemusic
+```
+
+**JSON**
+```json
+{"action": "pause", "player": "spotify"}
+{"action": "play"}
+```
+
+Supported actions: `play`, `pause`, `stop`, `toggle`.  
+Supported players: `spotify`, `applemusic` (also `apple_music`, `apple-music`, `music`, `apple`).  
+Omitting the player targets all active players.
+
+### Home Assistant auto-discovery
+
+When **Publish HA discovery** is enabled, MusicPauser publishes three entities to `homeassistant/…` on every connect:
+
+| Entity | Type | Purpose |
+|---|---|---|
+| Microphone In Use | `binary_sensor` | `ON` while any app is recording |
+| Music Player | `sensor` | `playing` / `stopped`; `player` attribute names the active app |
+| Playback Command | `select` | Send `play`, `pause`, `stop`, or `toggle` from the HA UI |
+
+All entities appear under a single **MusicPauser** device in Home Assistant and respect the availability topic, so they show as *unavailable* when the app is not running.
 
 ## Requirements
 
