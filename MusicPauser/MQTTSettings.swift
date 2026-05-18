@@ -51,31 +51,92 @@ private enum Keychain {
 // MARK: - MQTTSettings
 
 final class MQTTSettings: ObservableObject {
+    private static let usernameDefaultsKey = "mqtt.username"
 
     // MARK: UserDefaults-backed settings
 
     @AppStorage("mqtt.enabled")          var enabled:          Bool   = false
     @AppStorage("mqtt.host")             var host:             String = ""
     @AppStorage("mqtt.port")             var port:             Int    = 1883
-    @AppStorage("mqtt.username")         var username:         String = ""
     @AppStorage("mqtt.clientID")         var clientID:         String = MQTTSettings.makeClientID()
     @AppStorage("mqtt.topicPrefix")      var topicPrefix:      String = "musicpauser"
     @AppStorage("mqtt.deviceName")       var deviceName:       String = MQTTSettings.makeDeviceName()
     @AppStorage("mqtt.useTLS")           var useTLS:           Bool   = false
     @AppStorage("mqtt.publishDiscovery") var publishDiscovery: Bool   = true
 
-    // MARK: Keychain-backed password
+    // MARK: Manually-backed username (UserDefaults + keychain sync)
 
-    /// In-memory cache — read from Keychain once at init.
-    @Published var password: String = "" {
+    /// Backed manually so we can react to changes and sync the keychain accordingly.
+    @Published var username: String = UserDefaults.standard.string(forKey: MQTTSettings.usernameDefaultsKey) ?? "" {
         didSet {
-            if password.isEmpty { Keychain.delete() }
-            else                { Keychain.save(password) }
+            UserDefaults.standard.set(username, forKey: MQTTSettings.usernameDefaultsKey)
+            syncKeychainForUsernameChange(oldValue: oldValue, newValue: username)
         }
     }
 
-    init() {
+    // MARK: Keychain-backed password
+
+    /// Tracks whether the keychain has been consulted for the current username.
+    private var passwordLoaded = false
+
+    /// In-memory cache. Only read from Keychain lazily via `loadPasswordIfNeeded()`.
+    /// The `didSet` suppresses writes during the initial load assignment (before `passwordLoaded` is set).
+    @Published var password: String = "" {
+        didSet {
+            // Suppress keychain writes during the initial load assignment.
+            guard passwordLoaded else { return }
+
+            let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
+            let trimmedPassword = password.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            if trimmedUsername.isEmpty || trimmedPassword.isEmpty {
+                Keychain.delete()
+            } else {
+                Keychain.save(password)
+            }
+        }
+    }
+
+    // MARK: Init
+
+    init() {}
+
+    // MARK: Lazy keychain load
+
+    /// Loads the password from the Keychain if it hasn't been loaded yet for the current username.
+    ///
+    /// - Important: Must always be called on the **main thread** because it mutates `@Published` properties.
+    func loadPasswordIfNeeded() {
+        guard !passwordLoaded else { return }
+
+        let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedUsername.isEmpty else {
+            // No username configured — skip keychain entirely.
+            passwordLoaded = true
+            return
+        }
+
         password = Keychain.load() ?? ""
+        passwordLoaded = true
+    }
+
+    // MARK: Username change → keychain sync
+
+    /// Called whenever `username` changes. Clears the in-memory password and keychain entry
+    /// so a new (or empty) username always starts with a clean slate.
+    private func syncKeychainForUsernameChange(oldValue: String, newValue: String) {
+        let oldTrimmed = oldValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        let newTrimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // No effective change — nothing to do.
+        guard newTrimmed != oldTrimmed else { return }
+
+        // Username changed (including to empty): delete stored password and reset state.
+        Keychain.delete()
+        passwordLoaded = true   // Mark loaded so subsequent didSet on password will fire normally.
+        if !password.isEmpty {
+            password = ""
+        }
     }
 
     // MARK: Computed helpers
@@ -89,7 +150,11 @@ final class MQTTSettings: ObservableObject {
     var resolvedHost: String { host.trimmingCharacters(in: .whitespacesAndNewlines) }
     var resolvedPort: UInt16 { UInt16(max(1, min(65535, port))) }
     var resolvedUsername: String? { username.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty }
+
+    /// Returns the in-memory password as-is. Does NOT trigger a keychain load.
+    /// The lazy load is the responsibility of the view layer via `loadPasswordIfNeeded()`.
     var resolvedPassword: String? { password.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty }
+
     var isConfigured: Bool { enabled && !resolvedHost.isEmpty }
 
     // MARK: Default generators

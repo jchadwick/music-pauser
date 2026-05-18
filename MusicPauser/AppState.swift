@@ -12,6 +12,9 @@ final class AppState: ObservableObject {
     @AppStorage("autoResume")    var autoResume:    Bool = true  { didSet { coordinator.autoResume = autoResume } }
     @AppStorage("launchAtLogin") var launchAtLogin: Bool = false
 
+    let mqttSettings = MQTTSettings()
+    private(set) lazy var mqttService = MQTTService(settings: mqttSettings)
+
     private let micMonitor  = MicMonitor()
     private let coordinator = PlayerCoordinator()
     private let logger      = Logger(subsystem: "com.jchadwick.musicpauser", category: "AppState")
@@ -23,13 +26,18 @@ final class AppState: ObservableObject {
         activePlayer = coordinator.activePlayerKind
 
         coordinator.onPlaybackStateChanged = { [weak self] anyPlaying, active in
-            self?.isAnyPlaying = anyPlaying
-            self?.activePlayer = active
+            guard let self else { return }
+            self.isAnyPlaying = anyPlaying
+            self.activePlayer = active
+            self.mqttService.publishState(micInUse: self.micInUse, anyPlaying: anyPlaying, activePlayer: active)
         }
         coordinator.onAction = { [weak self] message in self?.lastAction = message }
 
         micMonitor.onChange = { [weak self] inUse in self?.handleMicChange(inUse: inUse) }
         micMonitor.start()
+
+        mqttService.onCommand = { [weak self] cmd in self?.handleMQTTCommand(cmd) }
+        mqttService.start()
     }
     deinit { micMonitor.stop() }
 
@@ -43,7 +51,17 @@ final class AppState: ObservableObject {
     private func handleMicChange(inUse: Bool) {
         guard micInUse != inUse else { return }
         micInUse = inUse
+        mqttService.publishState(micInUse: inUse, anyPlaying: isAnyPlaying, activePlayer: activePlayer)
         if inUse { coordinator.handleMicBecameActive() }
         else { coordinator.handleMicBecameInactive() }
+    }
+
+    private func handleMQTTCommand(_ cmd: MQTTCommand) {
+        switch cmd {
+        case .play(let player):   coordinator.play(player: player)
+        case .pause(let player):  coordinator.pause(player: player)
+        case .stop(let player):   coordinator.stop(player: player)
+        case .toggle(let player): coordinator.toggle(player: player)
+        }
     }
 }

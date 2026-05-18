@@ -15,13 +15,8 @@ struct MQTTSettingsView: View {
                 TextField("Broker Host", text: $settings.host)
                     .disableAutocorrection(true)
 
-                HStack {
-                    Text("Port")
-                    Spacer()
-                    TextField("1883", value: $settings.port, format: .number)
-                        .frame(width: 80)
-                        .multilineTextAlignment(.trailing)
-                }
+                TextField("Port", value: $settings.port, format: .number.grouping(.never))
+                    .multilineTextAlignment(.trailing)
 
                 Toggle("Use TLS / SSL", isOn: $settings.useTLS)
             }
@@ -89,6 +84,9 @@ struct MQTTSettingsView: View {
         .formStyle(.grouped)
         .frame(minWidth: 420, minHeight: 500)
         .padding()
+        .onAppear {
+            settings.loadPasswordIfNeeded()
+        }
     }
 
     private var statusColor: Color {

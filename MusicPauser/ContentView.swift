@@ -16,6 +16,15 @@ struct ContentView: View {
             set: { appState.setLaunchAtLogin($0) }
         ))
         Divider()
+        Button("MQTT Settings…") {
+            NSApp.activate(ignoringOtherApps: true)
+            if let window = NSApp.windows.first(where: { $0.title == "MQTT Settings" }) {
+                window.makeKeyAndOrderFront(nil)
+            } else {
+                openMQTTSettingsWindow()
+            }
+        }
+        Divider()
         Button("Quit MusicPauser") { NSApplication.shared.terminate(nil) }
     }
 
@@ -27,4 +36,16 @@ struct ContentView: View {
             Text("Active: none")
         }
     }
+
+    private func openMQTTSettingsWindow() {
+        let view = MQTTSettingsView(settings: appState.mqttSettings, service: appState.mqttService)
+        let controller = NSHostingController(rootView: view)
+        let window = NSWindow(contentViewController: controller)
+        window.title = "MQTT Settings"
+        window.styleMask = [.titled, .closable, .resizable]
+        window.setContentSize(NSSize(width: 460, height: 540))
+        window.center()
+        window.makeKeyAndOrderFront(nil)
+    }
 }
+

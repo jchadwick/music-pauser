@@ -73,6 +73,48 @@ final class PlayerCoordinator {
         notifyPlaybackChanged()
     }
 
+    // MARK: - MQTT command handlers
+
+    func play(player: PlayerKind?) {
+        let targets = player.map { k in controllers.filter { $0.kind == k } } ?? controllers
+        for c in targets where c.isRunning() {
+            c.play(); states[c.kind]?.isPlaying = true
+        }
+        log("MQTT: play \(player?.displayName ?? "all")")
+        notifyPlaybackChanged()
+    }
+
+    func pause(player: PlayerKind?) {
+        let targets = player.map { k in controllers.filter { $0.kind == k } } ?? controllers
+        for c in targets {
+            c.pause(); states[c.kind]?.isPlaying = false
+        }
+        log("MQTT: pause \(player?.displayName ?? "all")")
+        notifyPlaybackChanged()
+    }
+
+    func stop(player: PlayerKind?) {
+        let targets = player.map { k in controllers.filter { $0.kind == k } } ?? controllers
+        for c in targets {
+            c.pause(); states[c.kind]?.isPlaying = false
+        }
+        log("MQTT: stop \(player?.displayName ?? "all")")
+        notifyPlaybackChanged()
+    }
+
+    func toggle(player: PlayerKind?) {
+        let targets = player.map { k in controllers.filter { $0.kind == k } } ?? controllers
+        for c in targets {
+            if states[c.kind]?.isPlaying == true {
+                c.pause(); states[c.kind]?.isPlaying = false
+            } else if c.isRunning() {
+                c.play(); states[c.kind]?.isPlaying = true
+            }
+        }
+        log("MQTT: toggle \(player?.displayName ?? "all")")
+        notifyPlaybackChanged()
+    }
+
     private func subscribeToPlayerNotifications() {
         let musicObs = DistributedNotificationCenter.default().addObserver(
             forName: NSNotification.Name("com.apple.iTunes.playerInfo"),

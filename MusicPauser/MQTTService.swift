@@ -97,7 +97,7 @@ final class MQTTService: ObservableObject {
         let msgs: [(String, String, UInt8, Bool)] = [
             (MQTTTopics.micState(base: base),          MQTTTopics.micPayload(micInUse),             1, true),
             (MQTTTopics.playerState(base: base),       MQTTTopics.playerStatePayload(anyPlaying),   1, true),
-            (MQTTTopics.playerAttributes(base: base),  MQTTTopics.playerAttributesPayload(activePlayer), 1, true)
+            (MQTTTopics.playerAttributes(base: base),  MQTTTopics.playerAttributesPayload(anyPlaying: anyPlaying, activePlayer: activePlayer), 1, true)
         ]
         let c = client
         netQueue.async { msgs.forEach { c?.publish(topic: $0.0, payload: $0.1, qos: $0.2, retain: $0.3) } }
@@ -157,13 +157,13 @@ final class MQTTService: ObservableObject {
             c?.publish(topic: MQTTTopics.availability(base: base), payload: "online", qos: 1, retain: true)
             c?.subscribe(topic: MQTTTopics.command(base: base), qos: 1)
         }
-        publishCachedState()
-
         if settings.publishDiscovery {
             let msgs = MQTTTopics.discoveryMessages(settings: settings)
             let cl = client
             netQueue.async { msgs.forEach { cl?.publish(topic: $0.topic, payload: $0.payload, qos: 1, retain: true) } }
         }
+
+        publishCachedState()
     }
 
     private func handleDisconnected(expected: Bool, error: String?) {
@@ -193,7 +193,7 @@ final class MQTTService: ObservableObject {
         let msgs: [(String, String, UInt8, Bool)] = [
             (MQTTTopics.micState(base: base),         MQTTTopics.micPayload(cachedMicInUse),              1, true),
             (MQTTTopics.playerState(base: base),      MQTTTopics.playerStatePayload(cachedAnyPlaying),    1, true),
-            (MQTTTopics.playerAttributes(base: base), MQTTTopics.playerAttributesPayload(cachedActivePlayer), 1, true)
+            (MQTTTopics.playerAttributes(base: base), MQTTTopics.playerAttributesPayload(anyPlaying: cachedAnyPlaying, activePlayer: cachedActivePlayer), 1, true)
         ]
         let c = client
         netQueue.async { msgs.forEach { c?.publish(topic: $0.0, payload: $0.1, qos: $0.2, retain: $0.3) } }

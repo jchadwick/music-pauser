@@ -20,9 +20,12 @@ enum MQTTTopics {
         playing ? "playing" : "stopped"
     }
 
-    static func playerAttributesPayload(_ player: PlayerKind?) -> String {
-        if let p = player { return "{\"player\":\"\(p.rawValue)\"}" }
-        return "{\"player\":null}"
+    static func playerAttributesPayload(anyPlaying: Bool, activePlayer: PlayerKind?) -> String {
+        let playerValue: Any = activePlayer?.rawValue ?? NSNull()
+        return jsonString([
+            "player":   playerValue,
+            "playback": anyPlaying ? "playing" : "stopped"
+        ])
     }
 
     // MARK: - Home Assistant discovery messages
@@ -70,15 +73,18 @@ enum MQTTTopics {
                     "icon":         "mdi:microphone"
                 ])
             ),
-            // Sensor: player state
+            // Binary sensor: player — state reflects mic-in-use (ON/OFF)
             (
-                topic: "homeassistant/sensor/\(safeID)_player/config",
+                topic: "homeassistant/binary_sensor/\(safeID)_player/config",
                 payload: config([
-                    "name":                   "Music Player",
-                    "unique_id":              "\(safeID)_player",
-                    "state_topic":            playerState(base: base),
-                    "json_attributes_topic":  playerAttributes(base: base),
-                    "icon":                   "mdi:music"
+                    "name":                  "Music Player",
+                    "unique_id":             "\(safeID)_player",
+                    "state_topic":           micState(base: base),
+                    "payload_on":            "ON",
+                    "payload_off":           "OFF",
+                    "device_class":          "running",
+                    "json_attributes_topic": playerAttributes(base: base),
+                    "icon":                  "mdi:music"
                 ])
             ),
             // Select: playback command
